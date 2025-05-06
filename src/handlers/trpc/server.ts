@@ -2,7 +2,7 @@ import "server-only";
 
 import { createHydrationHelpers } from "@trpc/react-query/rsc";
 import { cache } from "react";
-import { appRouter } from "../router";
+import { appRouter } from "../../router";
 import { createCallerFactory, createTRPCContext } from "./init";
 import { makeQueryClient } from "./queryClient";
 

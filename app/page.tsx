@@ -1,6 +1,5 @@
-import { trpc } from "@/src/trpc/server";
+import { trpc } from "@/src/handlers/trpc/server";
 import Image from "next/image";
-import Test from "./test";
 
 export default async function Home() {
   const aaa = await trpc.getUserResume();
@@ -101,7 +100,6 @@ export default async function Home() {
           Go to nextjs.org →
         </a>
       </footer>
-      <Test />
     </div>
   );
 }

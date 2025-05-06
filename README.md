@@ -1,36 +1,88 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# フォルダ構成
 
-## Getting Started
+このプロジェクトは、クリーンアーキテクチャの4層構造をベースに、以下の原則を厳密に守って設計されています：
 
-First, run the development server:
+- 全ての依存は内向きのみ（依存性逆転を遵守）
+- UseCaseは抽象（InputPort / OutputPort）にのみ依存
+- 外部との接点（Presenter / Gateway）はinterface + 実装で分離
+- DTO / ViewModel / Mapper / Zod schemaはそれぞれの責務で分離
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+> ※構成はオーバーエンジニアリング気味ですが、大規模化・複数チーム開発に非常に強い構造です
+
+## 参考画像
+
+![Clean Architecture 図](/public/CleanArchitecture.jpg)
+
+## 各層
+
+- 🟦 - Frameworks & Drivers
+- 🟩 - Interface Adapters
+- 🟧 - Application Business Roles
+- 🟥 - Enterprise Business Roles）
+
+```markdown
+app/
+├── api/
+│   └── trpc/
+│       └── [trpc]/
+│           └── route.ts         　　　 🟦 (Web) - Webフレームワーク層
+└── page.tsx                           🟦 (UI)  - コンポーネント
+
+src/
+├── trpc/                              🟦 (Web) - Webフレームワーク層
+|   ├── routers/
+|       ├── resumeRouter.ts
+│   ├── router.ts
+│   ├── client.ts
+|   ├── server.ts
+|   ├── queryClient.ts
+│   └── init.ts
+
+├── handlers/                          🟦 (Web) - Routerから呼ばれる依存構築専用
+│   └── resumeHandler.ts
+
+├── domain/                            🟥 (Domain) - 値オブジェクト、エンティティ
+│   └── resume/
+│       ├── resume.ts
+│       ├── resumeId.ts
+│       └── resumeStatus.ts
+
+├── application/                       🟧 (UseCase)
+│   └── resume/
+│       ├── IResumeUseCase.ts             # Controllerが依存するインターフェース（InputPort）
+│       └── ResumeInteractor.ts           # Gatewayを呼ぶ実装
+
+├── gateways/                          🟩 (Gateway)
+│   └── resume/
+│       ├── IResumeGateway.ts             # UseCaseが依存するインターフェース
+│       └── ResumeGatewayImpl.ts          # Repositoryを呼び出し、永続化データをドメインモデルへ変換して返す（インフラ依存を吸収）
+
+├── presenters/                        🟩 (Presenter)
+│   └── resume/
+│       ├── IResumePresenter.ts           # UseCaseが依存するインターフェース（OutputPort）
+│       └── ResumePresenterImpl.ts        # ドメインモデルをUI用のViewModelに変換する（出力責務に特化）
+
+├── controllers/                       🟩 (Controller)
+│   └── resumeController.ts               # DTOをドメインに変換しUseCaseに渡し、Presenterの出力をHandlerに返す
+
+├── mappers/                           🟩 - DTO ↔ Domain ↔ ViewModel 変換
+│   └── resumeMapper.ts
+
+├── schemas/                           🟦 (Web) - ZodによるDTOバリデーション
+│   └── resumeSchema.ts
+
+├── dtos/                              🟩 - 入出力のDTO型を責務ごとに分離（input: resumeDto / output: resumeViewModel）
+│   ├── resumeDto.ts                     # input DTO（z.infer）
+│   └── resumeViewModel.ts               # output（UI向け）型
+
+├── infrastructure/
+│   ├── external/                      🟦 (External Interfaces)
+│   │   └── supabase/
+│   │       ├── supabaseClient.ts
+│   │       └── authGateway.ts
+│   ├── orm/                           🟦 (DB)
+│   │   ├── db.ts
+│   │   └── schema.ts
+│   └── repository/                    🟦 (DB)
+│       └── resumeRepository.ts
 ```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

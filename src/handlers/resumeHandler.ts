@@ -1,7 +1,7 @@
-import { protectedProcedure } from "../../handlers/trpc/init";
-import { getUserResumeMapper } from "./resumeMapper";
-import type { ResumeOutputData } from "./resumeSchema";
-import { resumeUseCase } from "./resumeUseCase";
+import { getUserResumeMapper } from "../features/resume/resumeMapper";
+import type { ResumeOutputData } from "../features/resume/resumeSchema";
+import { resumeUseCase } from "../features/resume/resumeUseCase";
+import { protectedProcedure } from "./trpc/init";
 
 export const resumeRouter = {
   getUserResume: protectedProcedure.query<ResumeOutputData["getUserResume"]>(

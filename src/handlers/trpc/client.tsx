@@ -1,12 +1,13 @@
 "use client";
-// ^-- to make sure we can mount the Provider from a server component
+
 import type { QueryClient } from "@tanstack/react-query";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink } from "@trpc/client";
 import { createTRPCReact } from "@trpc/react-query";
 import { useState } from "react";
-import type { AppRouter } from "../router";
+import type { AppRouter } from "../../router";
 import { makeQueryClient } from "./queryClient";
+
 export const trpc = createTRPCReact<AppRouter>();
 
 let clientQueryClientSingleton: QueryClient;

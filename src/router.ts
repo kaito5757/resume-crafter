@@ -1,5 +1,5 @@
 import { resumeRouter } from "./features/resume/resumeHandler";
-import { createTRPCRouter } from "./trpc/init";
+import { createTRPCRouter } from "./handlers/trpc/init";
 
 export const appRouter = createTRPCRouter({
   ...resumeRouter,
