@@ -4,8 +4,8 @@
 
 - 全ての依存は内向きのみ（依存性逆転を遵守）
 - UseCaseは抽象（InputPort / OutputPort）にのみ依存
-- 外部との接点（Presenter / Gateway）はinterface + 実装で分離
-- DTO / ViewModel / Mapper / Zod schemaはそれぞれの責務で分離
+- 外部との接点（Presenter / Gateway / Repository）はinterface + 実装で分離
+- DTO / ViewModel / Mapper / Schemaはそれぞれの責務で分離
 
 > ※構成はオーバーエンジニアリング気味ですが、大規模化・複数チーム開発に非常に強い構造です
 
@@ -22,54 +22,73 @@
 
 ```markdown
 app/
+├── login/
+|   ├── action.ts                      🟦 Server Action（formのaction属性に渡す）
+|   └── page.tsx                       🟦 Server Component
 ├── resume/
-|   ├── action.ts　　　　　　　　　　　　　🟦 (Web) - Server Action（formのaction属性に渡す）
-|   ├── handler.ts                     🟦 (Web) - Handler（Server Component / Actionから呼ばれる）
-|   └── page.tsx                       🟦 (UI)  - Server Component
+|   ├── action.ts                      🟦 Server Action（formのaction属性に渡す）
+|   └── page.tsx                       🟦 Server Component
 
 src/
-├── domain/                            🟥 (Domain) - 値オブジェクト、エンティティ
+├── domain/
+│   └── auth/
+│       ├── authUser.ts                🟥 Entity
+│       ├── authUserId.ts              🟥 Value Object
 │   └── resume/
-│       ├── resume.ts
-│       ├── resumeId.ts
-│       └── resumeStatus.ts
+│       ├── resume.ts                  🟥 Entity
+│       ├── resumeId.ts                🟥 Value Object
 
-├── application/                       🟧 (UseCase)
+
+├── application/
+│   └── auth/
+│       ├── IAuthUseCase.ts            🟧 UseCase 抽象 (InputPort)
+│       └── AuthInteractor.ts          🟧 UseCase 実装（ビジネス処理の本体）
 │   └── resume/
-│       ├── IResumeUseCase.ts             # Controllerが依存するインターフェース（InputPort）
-│       └── ResumeInteractor.ts           # Gatewayを呼ぶ実装
+│       ├── IResumeUseCase.ts          🟧 UseCase 抽象 (InputPort)
+│       └── ResumeInteractor.ts        🟧 UseCase 実装（ビジネス処理の本体）
 
-├── gateways/                          🟩 (Gateway)
+├── gateways/
+│   └── IAuthGateway.ts                🟩 Gateway 抽象（外部サービスとの連携インターフェース）
+
+├── repositories/
+│   └── IResumeRepository.ts           🟩 Repository 抽象（DBアクセスのインターフェース）
+
+├── presenters/
+│   └── auth/
+│       ├── IAuthPresenter.ts          🟩 Presenter 抽象（OutputPort/ドメイン → ViewModel 変換の入口）
+│       └── AuthPresenter.ts           🟩 Presenter 実装（ViewModel への整形処理）
 │   └── resume/
-│       ├── IResumeGateway.ts             # UseCaseが依存するインターフェース
-│       └── ResumeGatewayImpl.ts          # Repositoryを呼び出し、永続化データをドメインモデルへ変換して返す（インフラ依存を吸収）
+│       ├── IResumePresenter.ts        🟩 Presenter 抽象（OutputPort/ドメイン → ViewModel 変換の入口）
+│       └── ResumePresenter.ts         🟩 Presenter 実装（ViewModel への整形処理）
 
-├── presenters/                        🟩 (Presenter)
-│   └── resume/
-│       ├── IResumePresenter.ts           # UseCaseが依存するインターフェース（OutputPort）
-│       └── ResumePresenterImpl.ts        # ドメインモデルをUI用のViewModelに変換する（出力責務に特化）
+├─ handlers/
+│   └── authHandler.ts                 🟩 Handler
+│   └── resumeHandler.ts               🟩 Handler
 
-├── controllers/                       🟩 (Controller)
-│   └── resumeController.ts               # DTOをドメインに変換しUseCaseに渡し、Presenterの出力をHandlerに返す
+├── mappers/
+│   └── authMapper.ts                  🟩 Mapper（DTO ⇄ Domain の変換処理）
+│   └── resumeMapper.ts                🟩 Mapper（DTO ⇄ Domain の変換処理）
 
-├── mappers/                           🟩 - DTO → Domain 変換
-│   └── resumeMapper.ts
+├── schemas/
+│   └── authSchema.ts                  🟦 Input Validation Schema（zod）
+│   └── resumeSchema.ts                🟦 Input Validation Schema（zod）
 
-├── schemas/                           🟦 (Web) - ZodによるDTOバリデーション
-│   └── resumeSchema.ts
-
-├── dtos/                              🟩 - 入出力のDTO型を責務ごとに分離（input: resumeDto / output: resumeViewModel）
-│   ├── resumeDto.ts                     # input DTO（z.infer）
-│   └── resumeViewModel.ts               # output（UI向け）型
+├── dtos/
+|   └── auth/
+│       ├── authDto.ts                 🟩 Input DTO（formなどから受け取るデータ）
+│       └── authViewModel.ts           🟩 Output DTO（UI表示用のViewModel）
+|   └── resume/
+│       ├── resumeDto.ts               🟩 Input DTO（formなどから受け取るデータ）
+│       └── resumeViewModel.ts         🟩 Output DTO（UI表示用のViewModel）
 
 ├── infrastructure/
-│   ├── external/                      🟦 (External Interfaces)
+│   ├── external/
 │   │   └── supabase/
-│   │       ├── supabaseClient.ts
-│   │       └── authGateway.ts
-│   ├── orm/                           🟦 (DB)
-│   │   ├── db.ts
-│   │   └── schema.ts
-│   └── repository/                    🟦 (DB)
-│       └── resumeRepository.ts
+│   │       ├── supabaseClient.ts      🟦 Client（外部サービスの初期化）
+│   │       └── authGateway.ts         🟦 Gateway 実装（外部サービスで実装）
+│   ├── orm/
+│   │   ├── db.ts                      🟦 Client（ORM Clientの初期化）
+│   │   └── schema.ts                  🟦 DB Schema（ORM Modelの定義）
+│   └── repository/
+│       └── resumeRepository.ts        🟦 Repository 実装（DBで実装）
 ```
