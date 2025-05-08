@@ -22,25 +22,12 @@
 
 ```markdown
 app/
-├── api/
-│   └── trpc/
-│       └── [trpc]/
-│           └── route.ts         　　　 🟦 (Web) - Webフレームワーク層
-└── page.tsx                           🟦 (UI)  - コンポーネント
+├── resume/
+|   ├── action.ts　　　　　　　　　　　　　🟦 (Web) - Server Action（formのaction属性に渡す）
+|   ├── handler.ts                     🟦 (Web) - Handler（Server Component / Actionから呼ばれる）
+|   └── page.tsx                       🟦 (UI)  - Server Component
 
 src/
-├── trpc/                              🟦 (Web) - Webフレームワーク層
-|   ├── routers/
-|       ├── resumeRouter.ts
-│   ├── router.ts
-│   ├── client.ts
-|   ├── server.ts
-|   ├── queryClient.ts
-│   └── init.ts
-
-├── handlers/                          🟦 (Web) - Routerから呼ばれる依存構築専用
-│   └── resumeHandler.ts
-
 ├── domain/                            🟥 (Domain) - 値オブジェクト、エンティティ
 │   └── resume/
 │       ├── resume.ts
@@ -65,7 +52,7 @@ src/
 ├── controllers/                       🟩 (Controller)
 │   └── resumeController.ts               # DTOをドメインに変換しUseCaseに渡し、Presenterの出力をHandlerに返す
 
-├── mappers/                           🟩 - DTO ↔ Domain ↔ ViewModel 変換
+├── mappers/                           🟩 - DTO → Domain 変換
 │   └── resumeMapper.ts
 
 ├── schemas/                           🟦 (Web) - ZodによるDTOバリデーション
