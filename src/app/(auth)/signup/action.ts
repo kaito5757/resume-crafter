@@ -4,7 +4,7 @@ import type { SubmissionResult } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
 import { redirect } from "next/navigation";
 import { signUpSchema } from "../../../features/auth/model/schema";
-import { signUpUseCase } from "../../../features/auth/usecase/signUp";
+import { authUseCase } from "../../../features/auth/useCase/authUseCase";
 
 export async function signUpAction(
 	_: unknown,
@@ -17,7 +17,7 @@ export async function signUpAction(
 		return submission.reply();
 	}
 
-	const result = await signUpUseCase(submission.value);
+	const result = await authUseCase.signUp(submission.value);
 
 	if (result.isErr()) {
 		return submission.reply({

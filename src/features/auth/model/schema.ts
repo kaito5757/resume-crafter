@@ -15,6 +15,3 @@ export const signInSchema = z.object({
 		.email("有効なメールアドレスを入力してください"),
 	password: z.string().min(1, "パスワードは必須です"),
 });
-
-export type SignUpInput = z.infer<typeof signUpSchema>;
-export type SignInInput = z.infer<typeof signInSchema>;
