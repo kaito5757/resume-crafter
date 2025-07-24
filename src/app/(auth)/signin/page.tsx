@@ -1,49 +1,81 @@
 "use client";
 
+import { useForm } from "@conform-to/react";
+import { parseWithZod } from "@conform-to/zod";
+import Link from "next/link";
 import { useActionState } from "react";
+import { signInSchema } from "@/features/auth/model/schema";
 import { signInAction } from "./action";
 
 export default function SignIn() {
-	const [state, action, isPending] = useActionState(signInAction, null);
+	const [lastResult, action, isPending] = useActionState(
+		signInAction,
+		undefined,
+	);
+	const [form, fields] = useForm({
+		lastResult,
+		onValidate({ formData }) {
+			return parseWithZod(formData, { schema: signInSchema });
+		},
+		shouldValidate: "onBlur",
+		shouldRevalidate: "onInput",
+	});
 
 	return (
 		<div className="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
 			<h1 className="text-2xl font-bold mb-6 text-center">サインイン</h1>
-			{state?.error && (
-				<div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
-					{state.error}
+			{lastResult?.error && (
+				<div className="space-y-2 mb-4">
+					{Object.entries(lastResult.error).map(
+						([field, errors]) =>
+							errors && (
+								<div key={field} className="text-red-600 text-sm">
+									{field}: {errors.join(", ")}
+								</div>
+							),
+					)}
 				</div>
 			)}
-			<form action={action} className="space-y-4">
+			<form
+				id={form.id}
+				onSubmit={form.onSubmit}
+				action={action}
+				noValidate
+				className="space-y-4"
+			>
 				<div>
-					<label htmlFor="email" className="block text-sm font-medium text-gray-700">
+					<label
+						htmlFor="email"
+						className="block text-sm font-medium text-gray-700"
+					>
 						メールアドレス
 					</label>
 					<input
 						type="email"
-						id="email"
-						name="email"
+						key={fields.email.key}
+						name={fields.email.name}
+						defaultValue={fields.email.initialValue}
 						required
 						className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
 					/>
-					{state?.fieldErrors?.email && (
-						<p className="mt-1 text-sm text-red-600">{state.fieldErrors.email}</p>
-					)}
+					<p className="mt-1 text-sm text-red-600">{fields.email.errors}</p>
 				</div>
 				<div>
-					<label htmlFor="password" className="block text-sm font-medium text-gray-700">
+					<label
+						htmlFor="password"
+						className="block text-sm font-medium text-gray-700"
+					>
 						パスワード
 					</label>
 					<input
 						type="password"
-						id="password"
-						name="password"
+						key={fields.password.key}
+						name={fields.password.name}
+						defaultValue={fields.password.initialValue}
 						required
 						className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
 					/>
-					{state?.fieldErrors?.password && (
-						<p className="mt-1 text-sm text-red-600">{state.fieldErrors.password}</p>
-					)}
+					<p className="mt-1 text-sm text-red-600">{fields.password.errors}</p>
 				</div>
 				<button
 					type="submit"
@@ -54,10 +86,10 @@ export default function SignIn() {
 				</button>
 			</form>
 			<p className="mt-4 text-center text-sm text-gray-600">
-				アカウントをお持ちでない方は{" "}
-				<a href="/signup" className="text-blue-600 hover:text-blue-500">
+				アカウントをお持ちでない方は
+				<Link href="/signup" className="text-blue-600 hover:text-blue-500">
 					サインアップ
-				</a>
+				</Link>
 			</p>
 		</div>
 	);

@@ -1,49 +1,37 @@
-'use server';
+"use server";
 
-import { redirect } from 'next/navigation';
-import { signInSchema } from '../../../features/auth/model/schema';
-import { signInUseCase } from '../../../features/auth/usecase/signIn';
+import type { SubmissionResult } from "@conform-to/react";
+import { parseWithZod } from "@conform-to/zod";
+import { redirect } from "next/navigation";
+import { signInSchema } from "../../../features/auth/model/schema";
+import { authUseCase } from "../../../features/auth/useCase/authUseCase";
 
 export type SignInState = {
-  error?: string;
-  fieldErrors?: {
-    email?: string[];
-    password?: string[];
-  };
+	error?: string;
+	fieldErrors?: {
+		email?: string[];
+		password?: string[];
+	};
 };
 
 export async function signInAction(
-  prevState: SignInState | null,
-  formData: FormData
-): Promise<SignInState> {
-  const rawInput = {
-    email: formData.get('email') as string,
-    password: formData.get('password') as string,
-  };
+	_: unknown,
+	formData: FormData,
+): Promise<SubmissionResult<string[]>> {
+	const submission = parseWithZod(formData, {
+		schema: signInSchema,
+	});
+	if (submission.status !== "success") {
+		return submission.reply();
+	}
 
-  // Zodでバリデーション
-  const parseResult = signInSchema.safeParse(rawInput);
-  
-  if (!parseResult.success) {
-    const fieldErrors: SignInState['fieldErrors'] = {};
-    parseResult.error.issues.forEach((issue) => {
-      const field = issue.path[0] as keyof SignInState['fieldErrors'];
-      if (!fieldErrors[field]) {
-        fieldErrors[field] = [];
-      }
-      fieldErrors[field]!.push(issue.message);
-    });
-    return { fieldErrors };
-  }
+	const result = await authUseCase.signIn(submission.value);
 
-  // ユースケース実行
-  const result = await signInUseCase(parseResult.data);
-  
-  if (result.isOk()) {
-    redirect('/');
-  }
-  
-  return {
-    error: result.error.message,
-  };
+	if (result.isErr()) {
+		return submission.reply({
+			formErrors: [result.error.message],
+		});
+	}
+
+	redirect("/");
 }
