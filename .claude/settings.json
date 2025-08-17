@@ -6,11 +6,31 @@
 				"hooks": [
 					{
 						"type": "command",
-						"command": "jq -r '.tool_input.file_path | select(endswith(\".ts\") or endswith(\".tsx\"))' | xargs -I {} sh -c 'echo \"Formatting: {}\" && npm run biome:fix -- {}'"
+						"command": "jq -r '.tool_input.file_path | select(endswith(\".ts\") or endswith(\".tsx\"))' | xargs -I {} sh -c 'echo \"📝 Formatting: {}\" && npm run biome:fix -- {}'"
 					},
 					{
 						"type": "command",
-						"command": "jq -r '.tool_input.file_path | select(endswith(\".ts\") or endswith(\".tsx\"))' | xargs -I {} sh -c 'echo \"Type checking: {}\" && npm run typecheck 2>&1 || true'"
+						"command": "jq -r '.tool_input.file_path | select(endswith(\".ts\") or endswith(\".tsx\"))' | xargs -I {} sh -c 'echo \"🔍 Type checking: {}\" && npm run typecheck 2>&1 | grep -E \"error|warning\" || echo \"✅ No type errors\"'"
+					}
+				]
+			},
+			{
+				"matcher": "NotebookEdit",
+				"hooks": [
+					{
+						"type": "command",
+						"command": "echo '📊 Notebook updated - consider re-running cells if needed'"
+					}
+				]
+			}
+		],
+		"PreToolUse": [
+			{
+				"matcher": "Bash",
+				"hooks": [
+					{
+						"type": "command",
+						"command": "jq -r '.tool_input.command | select(contains(\"rm -rf\") or contains(\"sudo\"))' | xargs -I {} sh -c 'echo \"⚠️  危険なコマンドを検出: {}\" && exit 1'"
 					}
 				]
 			}
@@ -21,6 +41,30 @@
 					{
 						"type": "command",
 						"command": "afplay /System/Library/Sounds/Glass.aiff && echo '🔔 作業が完了しました'"
+					},
+					{
+						"type": "command",
+						"command": "git status --short | head -5 && echo '📋 変更されたファイル数: '$(git status --short | wc -l)"
+					}
+				]
+			}
+		],
+		"SessionStart": [
+			{
+				"hooks": [
+					{
+						"type": "command",
+						"command": "echo '🚀 Claude Code セッション開始 - '$(date +\"%Y-%m-%d %H:%M:%S\")"
+					}
+				]
+			}
+		],
+		"UserPromptSubmit": [
+			{
+				"hooks": [
+					{
+						"type": "command",
+						"command": "echo '💭 処理中...'"
 					}
 				]
 			}
