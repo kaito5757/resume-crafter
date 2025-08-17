@@ -1,0 +1,29 @@
+{
+	"hooks": {
+		"PostToolUse": [
+			{
+				"matcher": "Write|Edit|MultiEdit",
+				"hooks": [
+					{
+						"type": "command",
+						"command": "jq -r '.tool_input.file_path | select(endswith(\".ts\") or endswith(\".tsx\"))' | xargs -I {} sh -c 'echo \"Formatting: {}\" && npm run biome:fix -- {}'"
+					},
+					{
+						"type": "command",
+						"command": "jq -r '.tool_input.file_path | select(endswith(\".ts\") or endswith(\".tsx\"))' | xargs -I {} sh -c 'echo \"Type checking: {}\" && npm run typecheck 2>&1 || true'"
+					}
+				]
+			}
+		],
+		"Stop": [
+			{
+				"hooks": [
+					{
+						"type": "command",
+						"command": "afplay /System/Library/Sounds/Glass.aiff && echo '🔔 作業が完了しました'"
+					}
+				]
+			}
+		]
+	}
+}
