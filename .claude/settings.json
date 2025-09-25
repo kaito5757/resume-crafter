@@ -6,7 +6,7 @@
 				"hooks": [
 					{
 						"type": "command",
-						"command": "jq -r '.tool_input.file_path | select(endswith(\".ts\") or endswith(\".tsx\"))' | xargs -I {} sh -c 'echo \"📝 Formatting: {}\" && npm run biome:fix -- {}'"
+						"command": "jq -r '.tool_input.file_path | select(endswith(\".ts\") or endswith(\".tsx\"))' | xargs -I {} sh -c 'echo \"📝 Formatting: {}\" && npm run ultracite:check -- {}'"
 					},
 					{
 						"type": "command",
