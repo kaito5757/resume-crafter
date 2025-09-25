@@ -8,7 +8,12 @@
   "files": {
     "ignoreUnknown": false,
     "includes": [
-      "src/**/*.{js,jsx,ts,tsx,md}"
+      "src/**/*.{js,ts,tsx}",
+      "!src/db/migrations/*",
+      "!drizzle.config.ts",
+      "!tsconfig.json",
+      "!.vscode/settings.json",
+      "!.claude/*.json"
     ]
   },
   "formatter": {
@@ -34,7 +39,5 @@
       }
     }
   },
-  "extends": [
-    "ultracite"
-  ]
+  "extends": ["ultracite"]
 }

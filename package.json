@@ -8,8 +8,8 @@
     "start": "next start",
     "biome:check": "biome check ./src",
     "biome:fix": "biome check --fix ./src",
-    "ultracite:check": "ultracite check --fix",
-    "ultracite:fix": "ultracite check",
+    "ultracite:check": "ultracite check",
+    "ultracite:fix": "ultracite fix",
 
     "typecheck": "tsc --noEmit"
   },
