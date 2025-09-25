@@ -1,36 +1,40 @@
 {
-	"name": "resume-creator",
-	"version": "0.1.0",
-	"private": true,
-	"scripts": {
-		"dev": "next dev",
-		"build": "next build",
-		"start": "next start",
-		"biome:check": "biome check ./src",
-		"biome:fix": "biome check --fix ./src",
-		"typecheck": "tsc --noEmit"
-	},
-	"dependencies": {
-		"better-auth": "^1.2.12",
-		"drizzle-orm": "^0.44.2",
-		"neverthrow": "^8.2.0",
-		"next": "15.3.5",
-		"pg": "^8.16.3",
-		"react": "^19.0.0",
-		"react-dom": "^19.0.0",
-		"zod": "^3.25.76"
-	},
-	"devDependencies": {
-		"@biomejs/biome": "2.1.1",
-		"@conform-to/react": "^1.8.1",
-		"@conform-to/zod": "^1.8.1",
-		"@tailwindcss/postcss": "^4",
-		"@types/node": "^20",
-		"@types/pg": "^8.15.4",
-		"@types/react": "^19",
-		"@types/react-dom": "^19",
-		"drizzle-kit": "^0.31.4",
-		"tailwindcss": "^4",
-		"typescript": "^5"
-	}
+  "name": "resume-creator",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "biome:check": "biome check ./src",
+    "biome:fix": "biome check --fix ./src",
+    "ultracite:check": "ultracite check --fix",
+    "ultracite:fix": "ultracite check",
+
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "better-auth": "^1.2.12",
+    "drizzle-orm": "^0.44.2",
+    "neverthrow": "^8.2.0",
+    "next": "15.3.5",
+    "pg": "^8.16.3",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.2.4",
+    "@conform-to/react": "^1.8.1",
+    "@conform-to/zod": "^1.8.1",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/pg": "^8.15.4",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "drizzle-kit": "^0.31.4",
+    "tailwindcss": "^4",
+    "typescript": "^5",
+    "ultracite": "5.4.4"
+  }
 }
