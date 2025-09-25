@@ -10,6 +10,7 @@
     "includes": [
       "src/**/*.{js,ts,tsx}",
       "!src/db/migrations/*",
+      "!src/**/*.css",
       "!drizzle.config.ts",
       "!tsconfig.json",
       "!.vscode/settings.json",
