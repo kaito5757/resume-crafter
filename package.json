@@ -10,6 +10,7 @@
     "biome:fix": "biome check --fix ./src",
     "ultracite:check": "ultracite check",
     "ultracite:fix": "ultracite fix",
+    "ultracite:doctor": "ultracite doctor",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
